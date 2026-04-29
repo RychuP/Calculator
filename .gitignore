@@ -1,0 +1,11 @@
+# Compiled binaries
+calc
+
+# Object files
+*.o
+
+# IDE files
+*.swp
+
+# Build directories
+build/
