@@ -7,5 +7,6 @@ calc
 # IDE files
 *.swp
 
-# Build directories
+# Directories
 build/
+.vscode/
