@@ -1,8 +1,8 @@
-#Calculator
+# Calculator
 A C++ learning project.
 
-#Build
-Just type: make.
+# Build
+Just type *make*.
 
-#Run
+# Run
 ./calc
