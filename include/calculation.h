@@ -7,22 +7,38 @@
 #include <iostream>
 
 class Calculation {
-private:
-    double a_, b_, res_;
-    bool valid_;
+protected:
+    double a_, b_, res_ = 0.0;
+    bool valid_ = true;
     char op_;
     
 public:
-    Calculation(double _a, char _op, double _b);
+    Calculation(double a, char op, double b) : a_(a), b_(b), op_(op) {}
 
-    // checks if the operator is supported by the calculation
-    bool isValid() const;
+    virtual ~Calculation() = default; 
 
-    // prints the result of the calculation
+    virtual void calculate() = 0; 
+    
+    bool isValid() const { return valid_; }
     void printRes() const;
+};
 
-private:
-    void calculate();
+class BasicCalculation : public Calculation {
+public:
+    BasicCalculation(double a, char op, double b) : Calculation(a, op, b) {
+        calculate();
+    }
+
+    void calculate() override; 
+};
+
+class ScientificCalculation : public Calculation {
+public:
+    ScientificCalculation(double a, char op, double b) : Calculation(a, op, b) {
+        calculate();
+    }
+
+    void calculate() override;
 };
 
 #endif

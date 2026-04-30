@@ -1,5 +1,5 @@
-#include "user.h"
-#include "calculation.h"
+#include "../include/user.h"
+#include "../include/calculation.h"
 #include <vector> 
 
 void printSeparator();
@@ -23,6 +23,7 @@ int main() {
         double x, y;
         char o;
 
+        // get user input to calculate
         std::cout << "Enter calculation: ";
         if (!(std::cin >> x >> o >> y)) {
             std::cin.clear();
@@ -30,18 +31,25 @@ int main() {
             continue;
         }
 
-        auto calc_ptr = std::make_unique<Calculation>(x, o, y);
-        calc_ptr->printRes();
+        std::unique_ptr<Calculation> calc;
+       
+        // establish the type of calculation
+        if (o == '^' || o == 's')
+            calc = std::make_unique<ScientificCalculation>(x, o, y);
+        else
+            calc = std::make_unique<BasicCalculation>(x, o, y);
 
-        if (calc_ptr->isValid()) {
-            history.push_back(std::move(calc_ptr));
+        // print result
+        calc->printRes();
+
+        // save to history if valid
+        if (calc->isValid()) {
+            history.push_back(std::move(calc));
         }
         
         std::cout << "Continue? (y/n): ";
         std::cin >> choice;
-
-        if (choice == 'y')
-            printSeparator();
+        printSeparator();
     }
 
     // print calculation history
@@ -55,5 +63,5 @@ int main() {
 }
 
 void printSeparator() {
-    std::cout << "-x-+-----xx-----+-x-" << std::endl;
+    std::cout << "--------------------" << std::endl;
 }

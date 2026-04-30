@@ -1,11 +1,4 @@
-#include "calculation.h"
-
-Calculation::Calculation(double _a, char _op, double _b) 
-    : a_(_a), b_(_b), res_(0), valid_(false), op_(_op) {
-    calculate();
-}
-
-bool Calculation::isValid() const { return valid_; }
+#include "../include/calculation.h"
 
 void Calculation::printRes() const {
     std::cout << a_ << " " << op_ << " " << b_;
@@ -17,9 +10,7 @@ void Calculation::printRes() const {
     }
 }
 
-void Calculation::calculate() {
-    valid_ = true;
-
+void BasicCalculation::calculate() {
     switch (op_) {
         case '+':
             res_ = a_ + b_;
@@ -37,6 +28,22 @@ void Calculation::calculate() {
             else {
                 valid_ = false;
             }
+            break;
+        default:
+            valid_ = false;
+            break;
+    };
+}
+
+
+void ScientificCalculation::calculate() {
+    switch (op_) {
+        case '^':
+            res_ = std::pow(a_, b_);
+            break;
+        case 's':
+            if (a_ >= 0) res_ = std::sqrt(a_);
+            else valid_ = false;
             break;
         default:
             valid_ = false;
