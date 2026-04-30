@@ -30,7 +30,7 @@ public:
     char getOp() const { return op_; }
 
     // prints result of the calculation
-    void printRes() const;
+    virtual void printRes() const;
 
 protected:
     virtual void calculate() = 0;
@@ -61,6 +61,9 @@ public:
         }
         calculate();
     }
+
+public:
+    void printRes() const override;
 
 protected:
     void calculate() override;
