@@ -3,9 +3,12 @@
 #include <exception>
 #include <iostream>
 #include <stdexcept>
+#include <memory>
 #include <vector> 
+#include <sstream>
 
 void printSeparator();
+void printError(const std::string& message);
 
 int main() {
     std::vector<std::unique_ptr<Calculation>> history; 
@@ -21,20 +24,46 @@ int main() {
     printSeparator();
 
     // calculation loop
-    char choice = 'y';
-    while (choice == 'y') {
+    while (true) {
+        std::string input;
+        std::cout << "Enter calculation (or 'exit'): ";
+
+        // read user input
+        if (!std::getline(std::cin >> std::ws, input)) {
+            break; // If input completely fails, exit
+        }
+
+        // handle exit command
+        if (input == "exit") {
+            break;
+        }
+
+        // handle "ans" keyword for using the last result
+        size_t ans_pos = input.find("ans");
+        if (ans_pos != std::string::npos) {
+            if (history.empty()) {
+                printError("No previous calculation to use.");
+                continue;
+            }
+            
+            // get the last result
+            double last_result = history.back()->getRes();
+            
+            // replace "ans" with the last result if it exists
+            input.replace(ans_pos, 3, std::to_string(last_result));
+        }
+
+        // extract the math from our modified string
+        std::stringstream ss(input);
         double x, y;
         char o;
 
-        // get user input to calculate
-        std::cout << "Enter calculation: ";
-        if (!(std::cin >> x >> o >> y)) {
-            std::cin.clear();
-            std::cin.ignore(10000, '\n');
+        if (!(ss >> x >> o >> y)) {
+            printError("Invalid format. Please use 'Number Operator Number'.");
             continue;
         }
 
-        // create a ptr for a calculation
+        // create a calculation pointer
         std::unique_ptr<Calculation> calc;
        
         try {
@@ -51,21 +80,19 @@ int main() {
 
             // save calculation to history
             history.push_back(std::move(calc));
+            
+            printSeparator();
         }
         catch (const std::exception& e) {
-            std::cerr << "Error: " << e.what() << std::endl;
+            printError(e.what());
         }
-
-        std::cout << "Continue? (y/n): ";
-        std::cin >> choice;
-        printSeparator();
     }
 
     // print calculation history
     std::cout << "-- History ( " << history.size() << " ): --" << std::endl;
     
-    for (const std::unique_ptr<Calculation> &calc_ptr : history) {
-        calc_ptr->printRes();
+    for (const std::unique_ptr<Calculation> &calc : history) {
+        calc->printRes();
     }
 
     return 0;
@@ -73,4 +100,9 @@ int main() {
 
 void printSeparator() {
     std::cout << "--------------------" << std::endl;
+}
+
+void printError(const std::string &message){
+    std::cerr << "Error: " << message << std::endl;
+    printSeparator();
 }

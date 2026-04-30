@@ -29,6 +29,9 @@ public:
     // returns op (operator of the calculation)
     char getOp() const { return op_; }
 
+    // returns res (result of the calculation)
+    double getRes() const { return res_; }
+
     // prints result of the calculation
     virtual void printRes() const;
 

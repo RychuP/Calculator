@@ -10,7 +10,7 @@ void ScientificCalculation::printRes() const {
     if (op_ == 's')
         std::cout << "sqrt(" << a_ << ") = " << res_ << std::endl; 
     else if (op_ == '^')
-        std::cout << a_ << " to pwr of " << b_ << " = " << res_ << std::endl;  
+        std::cout << a_ << " to the power of " << b_ << " = " << res_ << std::endl;  
 }
 
 void BasicCalculation::calculate() {
