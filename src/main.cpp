@@ -1,5 +1,8 @@
 #include "../include/user.h"
 #include "../include/calculation.h"
+#include <exception>
+#include <iostream>
+#include <stdexcept>
 #include <vector> 
 
 void printSeparator();
@@ -31,22 +34,28 @@ int main() {
             continue;
         }
 
+        // create a ptr for a calculation
         std::unique_ptr<Calculation> calc;
        
-        // establish the type of calculation
-        if (o == '^' || o == 's')
-            calc = std::make_unique<ScientificCalculation>(x, o, y);
-        else
-            calc = std::make_unique<BasicCalculation>(x, o, y);
+        try {
+            // create a calculation based on the user input  
+            if (o == '^' || o == 's')
+                calc = std::make_unique<ScientificCalculation>(x, o, y);
+            else if (o == '+' || o == '-' || o == '*' || o == '/')
+                calc = std::make_unique<BasicCalculation>(x, o, y);
+            else
+                throw std::invalid_argument("Unsupported calculation operator.");
 
-        // print result
-        calc->printRes();
+            // print result
+            calc->printRes();
 
-        // save to history if valid
-        if (calc->isValid()) {
+            // save calculation to history
             history.push_back(std::move(calc));
         }
-        
+        catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+        }
+
         std::cout << "Continue? (y/n): ";
         std::cin >> choice;
         printSeparator();
