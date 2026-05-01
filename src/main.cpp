@@ -26,7 +26,7 @@ int main() {
     // calculation loop
     while (true) {
         std::string input;
-        double x, y;
+        double x = 0, y = 0;
         char o;
 
         std::cout << "Enter calculation (or 'exit'): ";
@@ -40,7 +40,7 @@ int main() {
         if (input == "exit") {
             break;
         }
-
+       
         try {
             // handle "ans" keyword for using the last result
             size_t ans_pos = input.find("ans");
@@ -57,28 +57,35 @@ int main() {
                 ans_pos = input.find("ans", ans_pos); 
             }
 
-            // extract the math from our modified string
+            // parse the input using stringstream
             std::stringstream ss(input);
-            if (!(ss >> x >> o >> y)) {
-                throw std::runtime_error("Invalid format. Please use 'Number Operator Number'.");
-            }
-        }
-        catch (const std::exception& e) {
-            printError(e.what());
-            continue;
-        }
 
-        // create a calculation pointer
-        std::unique_ptr<Calculation> calc;
-       
-        try {
-            // create a calculation based on the user input  
-            if (o == '^' || o == 's')
-                calc = std::make_unique<ScientificCalculation>(x, o, y);
-            else if (o == '+' || o == '-' || o == '*' || o == '/')
-                calc = std::make_unique<BasicCalculation>(x, o, y);
-            else
-                throw std::invalid_argument("Unsupported calculation operator.");
+            // 1. Try to read the first two parts (Number and Operator)
+            if (!(ss >> x >> o)) {
+                throw std::invalid_argument("Invalid format. Start with a number and operator.");
+            }
+
+            // create a calculation pointer
+            std::unique_ptr<Calculation> calc;
+
+            // check if the operation is unary
+            if (!(ss >> y)) {
+                if (o == 's') 
+                    calc = std::make_unique<ScientificCalculation>(x, o, y);
+                else if (o == '+' || o == '-' || o == '*' || o == '/' || o == '^')
+                    throw std::invalid_argument("This operator requires two numbers.");
+                else
+                    throw std::invalid_argument("Unknown unary operator.");
+            }
+            // handle binary operations
+            else {
+                if (o == '^')
+                    calc = std::make_unique<ScientificCalculation>(x, o, y);
+                else if (o == '+' || o == '-' || o == '*' || o == '/')
+                    calc = std::make_unique<BasicCalculation>(x, o, y);
+                else
+                    throw std::invalid_argument("Unsupported calculation operator.");
+            }
 
             // print result
             calc->printRes();
