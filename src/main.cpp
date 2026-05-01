@@ -26,6 +26,9 @@ int main() {
     // calculation loop
     while (true) {
         std::string input;
+        double x, y;
+        char o;
+
         std::cout << "Enter calculation (or 'exit'): ";
 
         // read user input
@@ -38,28 +41,30 @@ int main() {
             break;
         }
 
-        // handle "ans" keyword for using the last result
-        size_t ans_pos = input.find("ans");
-        if (ans_pos != std::string::npos) {
-            if (history.empty()) {
-                printError("No previous calculation to use.");
-                continue;
+        try {
+            // handle "ans" keyword for using the last result
+            size_t ans_pos = input.find("ans");
+            while (ans_pos != std::string::npos) {
+                if (history.empty()) {
+                    throw std::runtime_error("No previous calculation to use for 'ans'.");
+                }
+
+                // replace "ans" with the last result
+                double last_result = history.back()->getRes();
+                input.replace(ans_pos, 3, std::to_string(last_result));
+                
+                // look for the next "ans" starting from where we left off
+                ans_pos = input.find("ans", ans_pos); 
             }
-            
-            // get the last result
-            double last_result = history.back()->getRes();
-            
-            // replace "ans" with the last result if it exists
-            input.replace(ans_pos, 3, std::to_string(last_result));
+
+            // extract the math from our modified string
+            std::stringstream ss(input);
+            if (!(ss >> x >> o >> y)) {
+                throw std::runtime_error("Invalid format. Please use 'Number Operator Number'.");
+            }
         }
-
-        // extract the math from our modified string
-        std::stringstream ss(input);
-        double x, y;
-        char o;
-
-        if (!(ss >> x >> o >> y)) {
-            printError("Invalid format. Please use 'Number Operator Number'.");
+        catch (const std::exception& e) {
+            printError(e.what());
             continue;
         }
 
@@ -80,7 +85,7 @@ int main() {
 
             // save calculation to history
             history.push_back(std::move(calc));
-            
+
             printSeparator();
         }
         catch (const std::exception& e) {
@@ -88,13 +93,15 @@ int main() {
         }
     }
 
+    printSeparator();
+
     // print calculation history
     std::cout << "-- History ( " << history.size() << " ): --" << std::endl;
-    
     for (const std::unique_ptr<Calculation> &calc : history) {
         calc->printRes();
     }
 
+    // report successful exit
     return 0;
 }
 
